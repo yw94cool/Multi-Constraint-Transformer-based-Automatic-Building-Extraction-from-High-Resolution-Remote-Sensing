@@ -1,3 +1,3 @@
 # Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing
 
-There is the official implement of ***Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing***. Code will be coming soon.
+This is the official implementation of our paper ***Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing*** submitted to IEEE TGRS. Code will be coming soon.
