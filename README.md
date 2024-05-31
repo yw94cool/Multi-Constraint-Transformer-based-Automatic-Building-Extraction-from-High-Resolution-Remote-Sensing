@@ -44,3 +44,22 @@ results will be saved in **training_log**
 
 ### Small-scale result
 ![image](results/small-scale_result.png)
+
+
+## Reference
+This repo is mainly base on [TransUnet](https://github.com/Beckschen/TransUNet).
+
+## Citations
+If you find our work helpful, please cite our work:
+
+    @ARTICLE{10265007,
+        author={Yuan, Wei and Ran, Weihang and Shi, Xiaodan and Shibasaki, Ryosuke},
+        journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing}, 
+        title={Multiconstraint Transformer-Based Automatic Building Extraction From High-Resolution Remote Sensing Images}, 
+        year={2023},
+        volume={16},
+        number={},
+        pages={9164-9174},
+        keywords={Transformers;Feature extraction;Buildings;Remote sensing;Computational modeling;Convolutional neural networks;Task analysis;Deep learning;Building extraction;multiconstraint;remote sensing image;Transformer},
+        doi={10.1109/JSTARS.2023.3319826}
+    }
