@@ -1,6 +1,6 @@
 # Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing
 
-This is the official implementation of our paper ***Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing*** accepted by IEEE J-STARS. Code will be coming soon.
+This is the official implementation of our paper ***Multi-Constraint-Transformer-based-Automatic-Building-Extraction-from-High-Resolution-Remote-Sensing*** accepted by IEEE J-STARS.
 
 ## Install
     conda env create -f environment.yaml
@@ -37,6 +37,16 @@ this will generate a new directory named **Prepared_Vaihingen**
     python train.py
 
 results will be saved in **training_log**
+
+## Inference
+### 1.Get checkpoint
+
+Follow the aforementioned training process to train your own model, or you can directly download our pretrained model on Vaihingen dataset from [GoogleDrive](https://drive.google.com/file/d/1JHjFuGbeKK6TF-kh0udXpp6WxC1LaVda/view?usp=sharing)
+
+### 2.run
+    python test.py --root_path /Path/to/prepared/dataset/ --ckpt_path
+
+testing result will be saved in **test_log**
 
 ## Visual results
 ### Large-scale result
