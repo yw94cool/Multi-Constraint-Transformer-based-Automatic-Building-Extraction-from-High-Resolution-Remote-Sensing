@@ -44,7 +44,7 @@ results will be saved in **training_log**
 Follow the aforementioned training process to train your own model, or you can directly download our pretrained model on Vaihingen dataset from [GoogleDrive](https://drive.google.com/file/d/1JHjFuGbeKK6TF-kh0udXpp6WxC1LaVda/view?usp=sharing)
 
 ### 2.run
-    python test.py --root_path /Path/to/prepared/dataset/ --ckpt_path
+    python test.py --root_path /Path/to/prepared/dataset/ --ckpt_path /Path/to/saved/ckpt
 
 testing result will be saved in **test_log**
 
