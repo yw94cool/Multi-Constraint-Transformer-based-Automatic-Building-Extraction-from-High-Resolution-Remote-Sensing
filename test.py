@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datasets.dataset import Building_dataset
-from utils import test_single_case
+from utils import save_case, evaluation
 from networks.vit_seg_modeling import VisionTransformer as ViT_seg
 from networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
 
@@ -25,7 +25,7 @@ parser.add_argument('--num_classes', type=int,
 parser.add_argument('--batch_size', type=int, default=1,
                     help='batch_size per gpu')
 parser.add_argument('--img_size', type=int, default=256, help='input patch size of network input')
-parser.add_argument('--is_savenii', default=False, action="store_true", help='whether to save results during inference')
+parser.add_argument('--is_savenii', default=True, action="store_true", help='whether to save results during inference')
 
 parser.add_argument('--vit_name', type=str, default='R50-ViT-B_16', help='select one vit model')
 
@@ -42,18 +42,10 @@ def inference(args, model, test_save_path=None):
     testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=0)
     logging.info("{} test iterations per epoch".format(len(testloader)))
     model.eval()
-    metric_list = 0.0
+
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
         image, label, case_name = sampled_batch["image"], sampled_batch["label"], sampled_batch['case_name'][0]
-        metric_i = test_single_case(image, label, model, classes=args.num_classes, test_save_path=test_save_path, case=case_name)
-        metric_list += np.array(metric_i)
-        logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
-    metric_list = metric_list / len(db_test)
-    for i in range(1, args.num_classes):
-        logging.info('Mean class %d mean_dice %f mean_hd95 %f mean prec %f mean rec %f ' % (i, metric_list[i-1][0], metric_list[i-1][1], metric_list[i-1][2], metric_list[i-1][3]))
-    performance = np.mean(metric_list, axis=0)[0]
-    mean_hd95 = np.mean(metric_list, axis=0)[1]
-    logging.info('Testing performance in best val model: mean_dice : %f mean_hd95 : %f' % (performance, mean_hd95))
+        save_case(image, label, model, classes=args.num_classes, test_save_path=test_save_path, case=case_name)
     return "Testing Finished!"
 
 
@@ -105,3 +97,5 @@ if __name__ == "__main__":
     else:
         test_save_path = None
     inference(args, net, test_save_path)
+
+    evaluation(args.root_path, test_save_path)
