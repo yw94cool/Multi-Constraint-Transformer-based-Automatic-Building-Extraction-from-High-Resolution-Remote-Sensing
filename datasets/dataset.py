@@ -4,7 +4,6 @@ from PIL import Image
 import numpy as np
 import torch
 from scipy import ndimage
-# from scipy.ndimage.interpolation import zoom
 from torch.utils.data import Dataset
 from utils import convert_to_binary
 
@@ -40,9 +39,6 @@ class RandomGenerator(object):
         # print("IMAGE SHAPE: ", image.shape)
         x, y, _ = image.shape
         assert x == self.output_size and y == self.output_size, f'Image size {x}*{y} not equal to output size {self.output_size}, please check!'
-        # if x != self.output_size[0] or y != self.output_size[1]:
-        #     image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, 1), order=3)  # why not 3?
-        #     label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y), order=0)
         image = torch.from_numpy(image.astype(np.float32))
         image = image.permute(2, 0, 1)
 
@@ -86,9 +82,6 @@ class Building_dataset(Dataset):
             gt = convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
             x, y, _ = img.shape
             assert x == self.img_size and y == self.img_size, f'Image size {x}*{y} not equal to output size {self.img_size}, please check!'
-            # if x != self.img_size or y != self.img_size:
-            #     img = zoom(img, (self.img_size / x, self.img_size / y, 1), order=3)
-            #     gt = zoom(gt, (self.img_size / x, self.img_size / y), order=0)
             sample = {'image': torch.from_numpy(img).permute(2, 0, 1), 'label': torch.from_numpy(gt)}
         elif self.split == 'test':
             file_name = self.sample_list[idx].strip('\n')
@@ -98,9 +91,6 @@ class Building_dataset(Dataset):
             gt = convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
             x, y, _ = img.shape
             assert x == self.img_size and y == self.img_size, f'Image size {x}*{y} not equal to output size {self.img_size}, please check!'
-            # if x != self.img_size or y != self.img_size:
-            #     img = zoom(img, (self.img_size / x, self.img_size / y, 1), order=3)
-            #     gt = zoom(gt, (self.img_size / x, self.img_size / y), order=0)
             sample = {'image': torch.from_numpy(img).permute(2, 0, 1), 'label': torch.from_numpy(gt), 'case_name': file_name}
         else:
             raise NotImplementedError
