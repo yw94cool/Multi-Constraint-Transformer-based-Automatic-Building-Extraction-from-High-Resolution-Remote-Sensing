@@ -91,11 +91,11 @@ if __name__ == "__main__":
     logging.info(snapshot_name)
 
     if args.is_savenii:
-        args.test_save_dir = log_folder + '/predictions'
-        test_save_path = os.path.join(args.test_save_dir, args.exp, snapshot_name)
+        test_save_path = os.path.join(log_folder, 'predictions')
         os.makedirs(test_save_path, exist_ok=True)
     else:
         test_save_path = None
     inference(args, net, test_save_path)
 
-    evaluation(args.root_path, test_save_path)
+    if args.is_savenii:
+        evaluation(args.root_path, test_save_path)

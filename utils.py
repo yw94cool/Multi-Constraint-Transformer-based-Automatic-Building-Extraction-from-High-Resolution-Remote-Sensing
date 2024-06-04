@@ -182,6 +182,8 @@ def evaluation(data_root, pred_dir):
                 hds.append(hd)
                 Kappas.append(Kappa)
             # print("{} is over!".format(file))
-    data = ['Average', ave(f1_scores), ave(IoUs), ave(hds), ave(Kappas), ave(precs), ave(recs), ave(accs)]
+    result = 'Average: F1:{} IoU:{} HD:{} Kappa:{} Prec:{} Rec:{} Acc:{}'.format(
+        ave(f1_scores), ave(IoUs), ave(hds), ave(Kappas), ave(precs), ave(recs), ave(accs)
+        )
 
-    print(data)
+    print(result)
