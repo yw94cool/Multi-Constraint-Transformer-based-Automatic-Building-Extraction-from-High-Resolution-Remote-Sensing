@@ -143,8 +143,6 @@ def save_case(
 
     if test_save_path is not None:
         prediction[prediction==1] = 255
-        # i_j = case.split('area37_')[1].split('.')[0]
-        # new_case = f'top_mosaic_09cm_area37_{int(i_j[0])}_{int(i_j[-1])}.png'
         cv2.imwrite((test_save_path+'/'+ case), prediction)
 
 def ave(list):
@@ -172,8 +170,6 @@ def evaluation(data_root, pred_dir):
             assert file.endswith('.tif'), "The file is not a tif file!"
             pre = np.array(Image.open(os.path.join(pred_dir, file)).convert('L'))
             tar = convert_to_binary(np.array(Image.open(os.path.join(tar_dir, file)).convert('L')))
-            # pre = cv2.imread(os.path.join(pred_dir, file), 0)
-            # tar = cv2.imread(os.path.join(tar_dir, file.replace('png', 'tif')), 0)
             prec, rec, f1, acc, Kappa = get_ConfMax(pre, tar, pos=255, neg=0)
             IoU = get_IoU(pre, tar, pos=255)
             hd = get_HD(pre, tar, reversal=True)
