@@ -8,6 +8,7 @@ import SimpleITK as sitk
 import cv2
 import os
 from tqdm import tqdm
+from PIL import Image
 
 class DiceLoss(nn.Module):
     def __init__(self, n_classes):
@@ -142,17 +143,20 @@ def save_case(
 
     if test_save_path is not None:
         prediction[prediction==1] = 255
-        i_j = case.split('area37_')[1].split('.')[0]
-        new_case = f'top_mosaic_09cm_area37_{int(i_j[0])+1}-{int(i_j[-1])+1}.png'
-        cv2.imwrite((test_save_path+'/'+new_case), prediction)
-
-    # return metric_list
+        # i_j = case.split('area37_')[1].split('.')[0]
+        # new_case = f'top_mosaic_09cm_area37_{int(i_j[0])}_{int(i_j[-1])}.png'
+        cv2.imwrite((test_save_path+'/'+ case), prediction)
 
 def ave(list):
     """
     Use for calculating average
     """
     return sum(list)/len(list)
+
+def convert_to_binary(label):
+    label[label != 29] = 0 # 29 is the building class pixel value
+    label[label == 29] = 255
+    return label
 
 def evaluation(data_root, pred_dir):
     precs = list()
@@ -162,12 +166,14 @@ def evaluation(data_root, pred_dir):
     IoUs = list()
     hds = list()
     Kappas = list()
-    tar_dir = os.path.join(data_root, 'test_labels')
+    tar_dir = os.path.join(data_root, 'labels')
     for root, dirs, files in os.walk(pred_dir):
         for file in tqdm(files):
-            assert file.endswith('.png'), "The file is not a png file!"
-            pre = cv2.imread(os.path.join(pred_dir, file), 0)
-            tar = cv2.imread(os.path.join(tar_dir, file.replace('-', '_')), 0)
+            assert file.endswith('.tif'), "The file is not a tif file!"
+            pre = np.array(Image.open(os.path.join(pred_dir, file)).convert('L'))
+            tar = convert_to_binary(np.array(Image.open(os.path.join(tar_dir, file)).convert('L')))
+            # pre = cv2.imread(os.path.join(pred_dir, file), 0)
+            # tar = cv2.imread(os.path.join(tar_dir, file.replace('png', 'tif')), 0)
             prec, rec, f1, acc, Kappa = get_ConfMax(pre, tar, pos=255, neg=0)
             IoU = get_IoU(pre, tar, pos=255)
             hd = get_HD(pre, tar, reversal=True)
