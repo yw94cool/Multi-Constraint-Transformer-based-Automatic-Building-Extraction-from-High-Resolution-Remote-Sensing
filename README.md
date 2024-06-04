@@ -34,7 +34,7 @@ this will generate a new directory named **Prepared_Vaihingen**
     bash ./download_ckpt.sh
 
 ### 3.run
-    python train.py
+    python train.py --root_path /Path/to/prepared/dataset/
 
 results will be saved in **training_log**
 
