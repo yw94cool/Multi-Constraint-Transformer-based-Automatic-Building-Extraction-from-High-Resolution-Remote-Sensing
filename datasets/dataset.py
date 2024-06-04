@@ -4,8 +4,9 @@ from PIL import Image
 import numpy as np
 import torch
 from scipy import ndimage
-from scipy.ndimage.interpolation import zoom
+# from scipy.ndimage.interpolation import zoom
 from torch.utils.data import Dataset
+from utils import convert_to_binary
 
 
 def random_rot_flip(image, label):
@@ -38,9 +39,10 @@ class RandomGenerator(object):
             image, label = random_rotate(image, label)
         # print("IMAGE SHAPE: ", image.shape)
         x, y, _ = image.shape
-        if x != self.output_size[0] or y != self.output_size[1]:
-            image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, 1), order=3)  # why not 3?
-            label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y), order=0)
+        assert x == self.output_size and y == self.output_size, f'Image size {x}*{y} not equal to output size {self.output_size}, please check!'
+        # if x != self.output_size[0] or y != self.output_size[1]:
+        #     image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, 1), order=3)  # why not 3?
+        #     label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y), order=0)
         image = torch.from_numpy(image.astype(np.float32))
         image = image.permute(2, 0, 1)
 
@@ -49,6 +51,12 @@ class RandomGenerator(object):
         return sample
 
 class Building_dataset(Dataset):
+    """
+    Args:
+        args: configuration parameters
+        split: 'train', 'val' or "test"
+        transform: data augmentation
+    """
     def __init__(self, args, split, transform=None):
         self.base_dir = args.root_path
         self.img_size = args.img_size
@@ -59,18 +67,13 @@ class Building_dataset(Dataset):
     def __len__(self):
         return len(self.sample_list)
 
-    def convert_to_binary(self, label):
-        label[label != 29] = 0 # 29 is the building class pixel value
-        label[label == 29] = 255
-        return label
-
     def __getitem__(self, idx):
         if self.split == 'train':
             file_name = self.sample_list[idx].strip('\n')
             data_path = os.path.join(self.base_dir, 'images', file_name)
             img = np.array(Image.open(data_path).convert('RGB')).astype(np.float32) / 255.0
             label_path = os.path.join(self.base_dir, 'labels', file_name)
-            gt = self.convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
+            gt = convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
 
             sample = {'image': img, 'label': gt}
             if self.transform:
@@ -80,10 +83,25 @@ class Building_dataset(Dataset):
             data_path = os.path.join(self.base_dir, 'images', file_name)
             img = np.array(Image.open(data_path).convert('RGB')).astype(np.float32) / 255.0
             label_path = os.path.join(self.base_dir, 'labels', file_name)
-            gt = self.convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
+            gt = convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
             x, y, _ = img.shape
-            if x != self.img_size or y != self.img_size:
-                img = zoom(img, (self.img_size / x, self.img_size / y, 1), order=3)
-                gt = zoom(gt, (self.img_size / x, self.img_size / y), order=0)
+            assert x == self.img_size and y == self.img_size, f'Image size {x}*{y} not equal to output size {self.img_size}, please check!'
+            # if x != self.img_size or y != self.img_size:
+            #     img = zoom(img, (self.img_size / x, self.img_size / y, 1), order=3)
+            #     gt = zoom(gt, (self.img_size / x, self.img_size / y), order=0)
             sample = {'image': torch.from_numpy(img).permute(2, 0, 1), 'label': torch.from_numpy(gt)}
+        elif self.split == 'test':
+            file_name = self.sample_list[idx].strip('\n')
+            data_path = os.path.join(self.base_dir, 'images', file_name)
+            img = np.array(Image.open(data_path).convert('RGB')).astype(np.float32) / 255.0
+            label_path = os.path.join(self.base_dir, 'labels', file_name)
+            gt = convert_to_binary(np.array(Image.open(label_path).convert('L'))).astype(np.float32) / 255.0
+            x, y, _ = img.shape
+            assert x == self.img_size and y == self.img_size, f'Image size {x}*{y} not equal to output size {self.img_size}, please check!'
+            # if x != self.img_size or y != self.img_size:
+            #     img = zoom(img, (self.img_size / x, self.img_size / y, 1), order=3)
+            #     gt = zoom(gt, (self.img_size / x, self.img_size / y), order=0)
+            sample = {'image': torch.from_numpy(img).permute(2, 0, 1), 'label': torch.from_numpy(gt), 'case_name': file_name}
+        else:
+            raise NotImplementedError
         return sample
